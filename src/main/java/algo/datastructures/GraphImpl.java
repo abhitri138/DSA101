@@ -1,4 +1,4 @@
-package com.algo.datastructures;
+package algo.datastructures;
 
 public class GraphImpl {
     public static void depthFirstSearch() {

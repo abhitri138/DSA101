@@ -1,4 +1,4 @@
-package com.algo;
+package algo;
 
 public class Main {
 
