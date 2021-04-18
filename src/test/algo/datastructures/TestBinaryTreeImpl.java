@@ -1,7 +1,8 @@
 package algo.datastructures;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.testng.annotations.DataProvider;
+import org.testng.annotations.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -11,7 +12,13 @@ import java.util.logging.Logger;
 
 
 public class TestBinaryTreeImpl {
+
     private static Logger LOG = Logger.getLogger(TestBinaryTreeImpl.class.getName());
+
+    interface TreeTraversal {
+        public List<Integer> treeTraversal(BinaryTreeNode root);
+    }
+
     private static BinaryTreeNode arrayToTree(List<Integer> treeArray) {
         if (treeArray == null || treeArray.size() < 1) {
             return null;
@@ -39,24 +46,36 @@ public class TestBinaryTreeImpl {
         return root;
     }
 
-    @Test
-    public void testInOrderTraversal() {
-        // Adding an object array which will have input tree in inorder, out and corresponding testcase description
-        Object[][] testCases = {
-                {Arrays.asList(3,9,20,-1,-1,15,7), new Integer[]{9, 3, 15, 20, 7}, "Balanced binary tree"}
-        };
-
+    private void baseTest(Object[][] testCases, TreeTraversal treeTraversal) {
         for (Object[] testCase : testCases) {
             String testName = (String) testCase[2];
             LOG.info("Running Test: " + testName);
-            List<Integer> actualOutput = BinaryTreeImpl.inorderRecursive(arrayToTree( (List<Integer>) testCase[0]));
+            List<Integer> actualOutput = treeTraversal.treeTraversal(arrayToTree( (List<Integer>) testCase[0]));
             List<Integer> expectedOutput = Arrays.asList((Integer[]) testCase[1]);
+            Assert.assertEquals("Failed Test: " + testName + " Actual: " + actualOutput + " Expected: " + expectedOutput,
+                                        expectedOutput, actualOutput);
 
-            Assert.assertTrue("Failed Test: " + testName + " Actual: " + actualOutput + " Expected: " + expectedOutput,
-                    actualOutput.equals(expectedOutput));
         }
+    }
+
+    @DataProvider(name = "inoreder-dataprovider")
+    private Object[][] inOrderTraversalDP() {
+        // Adding an object array which will have input tree in inorder, out and corresponding testcase description
+        Object[][] testCases = {
+                {Arrays.asList(3,9,20,-1,-1,15,7), new Integer[]{9, 3, 15, 20, 7}, "Balanced binary tree"},
+                {new ArrayList<>(), new Integer[]{}, "Empty binary tree"},
+                {Arrays.asList(3,9,-1,15,-1,-1,-1,7), new Integer[]{7,15, 9, 3}, "UnBalanced binary tree"}
+        };
+        return testCases;
+    }
+
+    @Test(dataProvider = "inoreder-dataprovider")
+    public void testInOrderTraversal(Object[][] testCases) {
+        baseTest(testCases, BinaryTreeImpl::inorderRecursive);
      }
 
-
-
+    @Test(dataProvider = "inoreder-dataprovider")
+    public void testInOrderTraversalIterative(Object[][] testCases) {
+        baseTest(testCases, BinaryTreeImpl::inorderIterative);
+    }
 }
